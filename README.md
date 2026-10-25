@@ -3,8 +3,8 @@
 
 ## Student Information
 
-- Student Name: Mitesh Chavan
-- Roll Number: SEA 33
+- Student Name: Kshitij Khobragade
+- Roll Number: SEA 30
 - Division: ENTC
 - Batch: B
 - Course Name: Data Structures and Algorithms (DSA) Laboratory
