@@ -1,99 +1,248 @@
-1. Practical Title
-Student Database Management System Using an Array of Structures in C
+#include <stdio.h>
+#include <string.h>
 
-2. Problem Statement
-Develop a student result management system using an array of structures. Each student record contains roll number, name, program, course, subject marks, total marks, and average marks. The system supports displaying, searching, sorting, modifying, and adding student records.
+#define MAX 100
+#define SUBJECTS 3
 
-3. Objective
-   - To implement a student database using an array of structures.
-   - To perform insertion, searching, sorting, and modification of records.
-   - To calculate total and average marks.
-   - To understand structure handling and menu-driven programming in C.
-4. Algorithm or Approach
-   1. Start the program.
-   2. Define a structure to store student details.
-   3. Accept the number of students and their information.
-   4. Calculate the total and average marks for each student.
-   5. Display all student records when requested.
-   6.  Search for a student using the roll number.
-   7.  Sort student records by total marks in descending order.
-   8.  Modify an existing record or append a new student record.
-   9.  Repeat operations using a menu until the user chooses to exit.
-   10. Stop the program. 
+struct Student
+{
+    int roll;
+    char name[50];
+    char program[30];
+    char course[30];
+    float marks[SUBJECTS];
+    float total;
+    float average;
+};
 
-5.  Data Structure or Concept Used
-    - Structure: Stores different attributes of a student in one record.
-    - Array of structures: Stores multiple student records.
-    - Linear search: Finds a student using the roll number.
-    - Bubble sort: Sorts students by total marks.
-    - Functions: Separate the display, search, sort, modify, and append operations.
-    - Menu-driven programming: Allows users to select database operations.
-  
-6. Test Cases
-Test case	        Operation	                       Expected result
-    1  	            Add student	                  Student record is added
-    2	         Display records	                 All student details are displayed
-    3	        Search roll number 2	              Matching record is displayed
-    4	     Search nonexistent roll number	        Student not found
-    5	         Sort by total marks	             Records appear in descending order
-    6	       Modify student marks	            Total and average are recalculated
-    7	       Append a student	                New record is added to the database
+struct Student s[MAX];
+int count = 0;
 
-7. Sample Input and Output
-Sample input
+void calculate(int i)
+{
+    int j;
+    s[i].total = 0;
 
-Enter number of students: 2
+    for (j = 0; j < SUBJECTS; j++)
+        s[i].total += s[i].marks[j];
 
-Roll No: 1
-Name: Amit
-Program: BTech
-Course: ENTC
-Enter marks in 3 subjects: 80 75 85
+    s[i].average = s[i].total / SUBJECTS;
+}
 
-Roll No: 2
-Name: Rahul
-Program: BTech
-Course: ENTC
-Enter marks in 3 subjects: 90 85 95
+int search(int roll)
+{
+    int i;
 
-Sample output
+    for (i = 0; i < count; i++)
+        if (s[i].roll == roll)
+            return i;
 
-STUDENT DATABASE
+    return -1;
+}
 
-Roll No: 1
-Name: Amit
-Program: BTech
-Course: ENTC
-Total Marks: 240
-Average: 80.00
+void addStudent()
+{
+    int i, j;
 
-Roll No: 2
-Name: Rahul
-Program: BTech
-Course: ENTC
-Total Marks: 270
-Average: 90.00
+    if (count == MAX)
+    {
+        printf("Database is full!\n");
+        return;
+    }
 
-Search Roll No: 2
-Student Found: Rahul
-Total Marks: 270
-Average: 90.00
+    printf("Enter roll number: ");
+    scanf("%d", &s[count].roll);
 
-Sorted by Total Marks:
-Rahul - 270
-Amit  - 240
+    if (search(s[count].roll) != -1)
+    {
+        printf("Roll number already exists!\n");
+        return;
+    }
 
-8. Time Complexity
-    Let n be the number of students and m be the number of subjects.
-   - Display records: O
-   - Search record: O(n)
-   - Sort records using bubble sort: O(n^2)
-   - Modify record: O(n), including the search
-   - Append record: O(1) when array capacity is available
-   - Calculate total and average: O(m) per student
-  
-9. Space Complexity
-The space complexity is O(nm) for storing n student records with m subject marks, assuming a fixed number of additional fields per student.
+    printf("Enter name: ");
+    scanf(" %49[^\n]", s[count].name);
 
-1.  Conclusion
-The student database management system demonstrates how an array of structures stores and manages student information in C. It performs searching, sorting, modification, and insertion while calculating total and average marks, providing a basic foundation for database management.
+    printf("Enter program: ");
+    scanf(" %29s", s[count].program);
+
+    printf("Enter course: ");
+    scanf(" %29s", s[count].course);
+
+    printf("Enter marks in %d subjects: ", SUBJECTS);
+
+    for (j = 0; j < SUBJECTS; j++)
+        scanf("%f", &s[count].marks[j]);
+
+    calculate(count);
+    count++;
+
+    printf("Student added successfully.\n");
+}
+
+void display()
+{
+    int i, j;
+
+    if (count == 0)
+    {
+        printf("No student records available.\n");
+        return;
+    }
+
+    for (i = 0; i < count; i++)
+    {
+        printf("\nRoll No: %d\n", s[i].roll);
+        printf("Name: %s\n", s[i].name);
+        printf("Program: %s\n", s[i].program);
+        printf("Course: %s\n", s[i].course);
+
+        printf("Marks: ");
+        for (j = 0; j < SUBJECTS; j++)
+            printf("%.2f ", s[i].marks[j]);
+
+        printf("\nTotal: %.2f", s[i].total);
+        printf("\nAverage: %.2f\n", s[i].average);
+    }
+}
+
+void searchStudent()
+{
+    int roll, i;
+
+    printf("Enter roll number to search: ");
+    scanf("%d", &roll);
+
+    i = search(roll);
+
+    if (i == -1)
+        printf("Student not found.\n");
+    else
+    {
+        printf("Student Found: %s\n", s[i].name);
+        printf("Roll No: %d\n", s[i].roll);
+        printf("Total: %.2f\n", s[i].total);
+        printf("Average: %.2f\n", s[i].average);
+    }
+}
+
+void sortStudents()
+{
+    int i, j;
+    struct Student temp;
+
+    for (i = 0; i < count - 1; i++)
+    {
+        for (j = 0; j < count - i - 1; j++)
+        {
+            if (s[j].total < s[j + 1].total)
+            {
+                temp = s[j];
+                s[j] = s[j + 1];
+                s[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("Records sorted by total marks.\n");
+    display();
+}
+
+void modifyStudent()
+{
+    int roll, i, j;
+
+    printf("Enter roll number to modify: ");
+    scanf("%d", &roll);
+
+    i = search(roll);
+
+    if (i == -1)
+    {
+        printf("Student not found.\n");
+        return;
+    }
+
+    printf("Enter new name: ");
+    scanf(" %49[^\n]", s[i].name);
+
+    printf("Enter new program: ");
+    scanf(" %29s", s[i].program);
+
+    printf("Enter new course: ");
+    scanf(" %29s", s[i].course);
+
+    printf("Enter new marks: ");
+
+    for (j = 0; j < SUBJECTS; j++)
+        scanf("%f", &s[i].marks[j]);
+
+    calculate(i);
+
+    printf("Record modified successfully.\n");
+}
+
+int main()
+{
+    int choice, i, n;
+
+    printf("Enter initial number of students: ");
+    scanf("%d", &n);
+
+    if (n < 0 || n > MAX)
+    {
+        printf("Invalid number of students.\n");
+        return 1;
+    }
+
+    for (i = 0; i < n; i++)
+    {
+        printf("\nStudent %d\n", i + 1);
+        addStudent();
+    }
+
+    do
+    {
+        printf("\n--- STUDENT DATABASE MENU ---\n");
+        printf("1. Display Students\n");
+        printf("2. Search Student\n");
+        printf("3. Sort by Total Marks\n");
+        printf("4. Modify Student\n");
+        printf("5. Append Student\n");
+        printf("6. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice)
+        {
+        case 1:
+            display();
+            break;
+
+        case 2:
+            searchStudent();
+            break;
+
+        case 3:
+            sortStudents();
+            break;
+
+        case 4:
+            modifyStudent();
+            break;
+
+        case 5:
+            addStudent();
+            break;
+
+        case 6:
+            printf("Exiting program.\n");
+            break;
+
+        default:
+            printf("Invalid choice.\n");
+        }
+
+    } while (choice != 6);
+
+    return 0;
+}
